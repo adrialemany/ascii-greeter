@@ -1,32 +1,40 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# --- Utilidades ---
 info()  { printf "\033[1;34m[INFO]\033[0m %s\n" "$*"; }
 ok()    { printf "\033[1;32m[OK]\033[0m %s\n" "$*"; }
 warn()  { printf "\033[1;33m[WARN]\033[0m %s\n" "$*"; }
 error() { printf "\033[1;31m[ERROR]\033[0m %s\n" "$*" >&2; }
 
-# Directorio absoluto donde está este script (raíz del repo)
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-# Rutas absolutas a los scripts que usaremos
 WELCOME_SCRIPT="$SCRIPT_DIR/scripts/.ascii-welcome.sh"
 LAUNCH_SCRIPT="$SCRIPT_DIR/scripts/launch-terminal-maximized.sh"
 
-# --- 1) Añadir bloque al final de ~/.bashrc con rutas ABSOLUTAS ---
 BASHRC="${HOME}/.bashrc"
 MARKER_START="# >>> ascii-greeter block (auto-added) >>>"
 MARKER_END="# <<< ascii-greeter block (auto-added) <<<"
 
+info "Hi! This is your ASCII Installer Setup Helper."
+info "The necessary code to see your drawings will be automatically added to file .bashrc."
+info "Read each question and answer depending on how much custamization you want."
+info "All important info is in the README file. Briefly, what you need to know is:"
+info "1. To add new drawings, just add them to the root of the repo."
+info "2. If there are no drawings, just a message will be shown."
+info "3. To modify the info or text shown in terminal, modify scripts/.ascii-welcome.sh"
+info "4. To find interesting ASCII drawings, visit:"
+info "https://www.asciiart.eu/"
+info "5. Any suggestions? Email me to al426695@uji.es!"
+
+
 if grep -Fq "$MARKER_START" "$BASHRC"; then
-  info "Bloque ascii-greeter ya presente en ~/.bashrc. No se duplicará."
+  info "ascii-greeter block already present in ~/.bashrc. It will not be duplicated."
 else
-  info "Añadiendo bloque ascii-greeter al final de ~/.bashrc…"
+  info "Adding ascii-greeter block to the end of ~/.bashrc…"
   {
     echo ""
     echo "$MARKER_START"
-    # Escribimos la ruta ABSOLUTA ya expandida
+
     echo "if [ -t 1 ] && [ -z \"\$NO_ASCII_ART\" ]; then"
     echo "    \"$WELCOME_SCRIPT\""
     echo "fi"
@@ -36,58 +44,50 @@ else
     echo "echo \"\""
     echo "$MARKER_END"
   } >> "$BASHRC"
-  ok "Bloque añadido a ~/.bashrc."
+  ok "Block added to ~/.bashrc."
 fi
 
-# Aviso si falta el script de bienvenida (no bloquea la instalación)
 if [[ ! -f "$WELCOME_SCRIPT" ]]; then
-  warn "No se encontró $WELCOME_SCRIPT. Crea ese archivo si quieres el saludo ASCII."
+  warn "Did not find $WELCOME_SCRIPT. Create that file if you want the ASCII greeting."
 fi
 
 echo
 
-# --- 2) Preguntar sobre el atajo maximizado ---
 read -r -p 'Do you want to open the terminal always in full screen mode with Ctrl + Alt + T? (yes/no) ' ANSWER
 ANSWER="$(echo "${ANSWER:-}" | tr '[:upper:]' '[:lower:]')"
 
 case "$ANSWER" in
   y|yes)
-    info "Configurando atajo personalizado 'Maximized Terminal' con Ctrl+Alt+T…"
+    info "Setting up custom shortcut 'Maximized Terminal' with Ctrl+Alt+T…"
 
-    # Verificaciones básicas
     if ! command -v gsettings >/dev/null 2>&1; then
-      error "gsettings no está disponible. ¿Estás en GNOME? Abortando."
+      error "gsettings is not available. Are you on GNOME? Aborting."
       exit 1
     fi
 
     if [[ ! -f "$LAUNCH_SCRIPT" ]]; then
-      error "No se encontró el script: $LAUNCH_SCRIPT"
-      error "Asegúrate de que exista y vuelve a ejecutar este instalador."
+      error "Script not found: $LAUNCH_SCRIPT"
+      error "Make sure it exists and re-run this installer."
       exit 1
     fi
 
     chmod +x "$LAUNCH_SCRIPT" || true
 
-    # 2.a) Deshabilitar atajo por defecto de 'Launchers → Terminal'
-    # Clave: org.gnome.settings-daemon.plugins.media-keys terminal
     if gsettings writable org.gnome.settings-daemon.plugins.media-keys terminal >/dev/null 2>&1; then
       CURRENT_BINDING="$(gsettings get org.gnome.settings-daemon.plugins.media-keys terminal || true)"
-      info "Atajo por defecto actual (terminal): ${CURRENT_BINDING:-desconocido}"
+      info "Current default shortcut (terminal): ${CURRENT_BINDING:-unknown}"
       gsettings set org.gnome.settings-daemon.plugins.media-keys terminal "[]"
-      ok "Atajo por defecto deshabilitado."
+      ok "Default shortcut disabled."
     else
-      warn "No se pudo acceder a la clave 'terminal' de media-keys. Continuando igualmente."
+      warn "Couldn't access the 'terminal' key under media-keys. Continuing anyway."
     fi
 
-    # 2.b) Crear/actualizar atajo en Custom Shortcuts
     BASE_SCHEMA="org.gnome.settings-daemon.plugins.media-keys"
     CUSTOM_LIST_KEY="custom-keybindings"
     CUSTOM_PATH="/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/maximized-terminal/"
 
-    # Obtener lista actual de custom keybindings
     EXISTING_LIST="$(gsettings get ${BASE_SCHEMA} ${CUSTOM_LIST_KEY} 2>/dev/null || echo "[]")"
 
-    # Añadir nuestro path si no está ya
     if [[ "$EXISTING_LIST" != *"$CUSTOM_PATH"* ]]; then
       if [[ "$EXISTING_LIST" == "[]" || "$EXISTING_LIST" == "@as []" ]]; then
         NEW_LIST="['$CUSTOM_PATH']"
@@ -95,43 +95,41 @@ case "$ANSWER" in
         NEW_LIST="${EXISTING_LIST%]*}, '$CUSTOM_PATH']"
       fi
       gsettings set ${BASE_SCHEMA} ${CUSTOM_LIST_KEY} "$NEW_LIST"
-      info "Añadido a la lista de Custom Shortcuts."
+      info "Added to the Custom Shortcuts list."
     else
-      info "El atajo personalizado ya estaba listado."
+      info "The custom shortcut was already listed."
     fi
 
-    # Establecer nombre, comando y combinación
     CUSTOM_SCHEMA="org.gnome.settings-daemon.plugins.media-keys.custom-keybinding"
     gsettings set "${CUSTOM_SCHEMA}:${CUSTOM_PATH}" name "Maximized Terminal"
     gsettings set "${CUSTOM_SCHEMA}:${CUSTOM_PATH}" command "$LAUNCH_SCRIPT"
     gsettings set "${CUSTOM_SCHEMA}:${CUSTOM_PATH}" binding "<Primary><Alt>T"
 
-    ok "Atajo personalizado configurado."
+    ok "Custom shortcut configured."
 
     echo
-    info "Resumen:"
-    echo "  - ~/.bashrc actualizado (con ruta absoluta al repo)."
-    echo "  - Atajo por defecto (Launchers → Terminal) deshabilitado."
-    echo "  - Nuevo atajo (Custom Shortcuts → Maximized Terminal) con Ctrl+Alt+T."
-    echo "  - Comando: $LAUNCH_SCRIPT"
+    info "Summary:"
+    echo "  - ~/.bashrc updated (with absolute path to the repo)."
+    echo "  - Default shortcut (Launchers → Terminal) disabled."
+    echo "  - New shortcut (Custom Shortcuts → Maximized Terminal) with Ctrl+Alt+T."
+    echo "  - Command: $LAUNCH_SCRIPT"
     ;;
 
   n|no|*)
-    info "No se modificarán los atajos de teclado. Solo se actualizó ~/.bashrc."
+    info "Keyboard shortcuts will not be modified. Only ~/.bashrc was updated."
     ;;
 esac
 
 echo
 
-# --- 3) Preguntar sobre abrir terminal maximizada al iniciar el sistema ---
-read -r -p '¿Quieres que al iniciar sesión se abra automáticamente la terminal maximizada? (yes/no) ' AUTOSTART_ANSWER
+read -r -p 'Do you want a maximized terminal to open automatically at login? (yes/no) ' AUTOSTART_ANSWER
 AUTOSTART_ANSWER="$(echo "${AUTOSTART_ANSWER:-}" | tr '[:upper:]' '[:lower:]')"
 
 case "$AUTOSTART_ANSWER" in
   y|yes)
     if [[ ! -f "$LAUNCH_SCRIPT" ]]; then
-      error "No se encontró el script: $LAUNCH_SCRIPT"
-      error "Necesario para el arranque automático. Cancelo esta parte."
+      error "Script not found: $LAUNCH_SCRIPT"
+      error "Required for autostart. Cancelling this part."
     else
       chmod +x "$LAUNCH_SCRIPT" || true
       AUTOSTART_DIR="$HOME/.config/autostart"
@@ -139,7 +137,6 @@ case "$AUTOSTART_ANSWER" in
 
       mkdir -p "$AUTOSTART_DIR"
 
-      # Creamos el .desktop que GNOME ejecuta al iniciar sesión
       cat > "$AUTOSTART_DESKTOP" <<EOF
 [Desktop Entry]
 Type=Application
@@ -148,17 +145,17 @@ Comment=Open a maximized terminal on login
 Exec=$LAUNCH_SCRIPT
 X-GNOME-Autostart-enabled=true
 OnlyShowIn=GNOME;Unity;
-# Puedes añadir un retardo opcional (segundos):
+# You can add an optional delay (seconds):
 # X-GNOME-Autostart-Delay=2
 EOF
-      ok "Arranque automático configurado: $AUTOSTART_DESKTOP"
-      info "En el siguiente inicio de sesión se abrirá la terminal maximizada."
+      ok "Autostart configured: $AUTOSTART_DESKTOP"
+      info "A maximized terminal will open on the next login."
     fi
     ;;
   n|no|*)
-    info "No se configuró arranque automático."
+    info "Autostart not configured."
     ;;
 esac
 
-ok "Proceso completado."
+ok "Process completed."
 
