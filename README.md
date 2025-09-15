@@ -17,11 +17,29 @@ The goal of this repository is to:
 
 ---
 
+## 🚀 Installation
+
+1. Clone the repository:
+
+git clone https://github.com/adrialemany/ascii-greeter.git ~/ascii-greeter  
+cd ~/ascii-greeter  
+
+2. Run the installer:
+
+./LAUNCH_ME.sh  
+
+3. Follow the prompts:  
+   - Add the greeter to `.bashrc`.  
+   - Configure the maximized terminal shortcut (optional).  
+   - Enable autostart at login (optional).  
+
+---
+
 ## ⚙️ How it works
 
 There are three main scripts:
 
-1. **LAUNCH_ME.sh**  
+1. **LAUNCH_ME.sh** (the only script you need to launch)
    The installer.  
    - Adds a block to your `~/.bashrc` that runs the greeter on every new terminal session.  
    - Asks if you want to configure `Ctrl + Alt + T` to always open a maximized terminal.  
@@ -88,24 +106,6 @@ If you want it to appear in the info block, simply add this line to `sys_info_li
 
 ---
 
-## 🚀 Installation
-
-1. Clone the repository:
-
-git clone https://github.com/adrialemany/ascii-greeter.git ~/ascii-greeter  
-cd ~/ascii-greeter  
-
-2. Run the installer:
-
-./LAUNCH_ME.sh  
-
-3. Follow the prompts:  
-   - Add the greeter to `.bashrc`.  
-   - Configure the maximized terminal shortcut (optional).  
-   - Enable autostart at login (optional).  
-
----
-
 ## 🛠️ Customization
 
 - **Add or remove ASCII art**: put `.txt` files in the repository root.  
@@ -125,16 +125,16 @@ Feel free to open an issue or send an email: **al426695@uji.es**
 
 When you open a new terminal, you’ll see something like this:
 
-<ASCII ART HERE>       Welcome back, Master  
-                       User: yourname  
-                       Device: hostname  
-                       OS: Ubuntu 22.04 LTS  
-                       Uptime: up 2 hours, 13 minutes  
-                       Kernel: 6.8.0-45-generic  
-                       CPU: Intel(R) Core(TM) i7-8650U  
-                       RAM: 3.4G / 15G  
-                       Battery: 87%  
-
+██████╗  █████╗ ██████╗      Welcome back, Master 
+██╔══██╗██╔══██╗██╔══██╗     User: yourname 
+██║  ██║███████║██████╔╝     Device: hostname  
+██║  ██║██╔══██║██╔═══╝      OS: Ubuntu 22.04 LTS 
+██████╔╝██║  ██║██║          Uptime: up 2 hours, 13 minutes 
+╚═════╝ ╚═╝  ╚═╝╚═╝          Kernel: 6.8.0-45-generic            
+                             CPU: Intel(R) Core(TM) i7-8650U  
+                             RAM: 3.4G / 15G  
+                             Battery: 87% 
+                             
 ---
 
 Enjoy your personalized terminal experience! 🎉
