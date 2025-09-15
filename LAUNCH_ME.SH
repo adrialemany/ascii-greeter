@@ -121,4 +121,44 @@ case "$ANSWER" in
     ;;
 esac
 
+echo
+
+# --- 3) Preguntar sobre abrir terminal maximizada al iniciar el sistema ---
+read -r -p '¿Quieres que al iniciar sesión se abra automáticamente la terminal maximizada? (yes/no) ' AUTOSTART_ANSWER
+AUTOSTART_ANSWER="$(echo "${AUTOSTART_ANSWER:-}" | tr '[:upper:]' '[:lower:]')"
+
+case "$AUTOSTART_ANSWER" in
+  y|yes)
+    if [[ ! -f "$LAUNCH_SCRIPT" ]]; then
+      error "No se encontró el script: $LAUNCH_SCRIPT"
+      error "Necesario para el arranque automático. Cancelo esta parte."
+    else
+      chmod +x "$LAUNCH_SCRIPT" || true
+      AUTOSTART_DIR="$HOME/.config/autostart"
+      AUTOSTART_DESKTOP="$AUTOSTART_DIR/maximized-terminal-on-startup.desktop"
+
+      mkdir -p "$AUTOSTART_DIR"
+
+      # Creamos el .desktop que GNOME ejecuta al iniciar sesión
+      cat > "$AUTOSTART_DESKTOP" <<EOF
+[Desktop Entry]
+Type=Application
+Name=Maximized Terminal
+Comment=Open a maximized terminal on login
+Exec=$LAUNCH_SCRIPT
+X-GNOME-Autostart-enabled=true
+OnlyShowIn=GNOME;Unity;
+# Puedes añadir un retardo opcional (segundos):
+# X-GNOME-Autostart-Delay=2
+EOF
+      ok "Arranque automático configurado: $AUTOSTART_DESKTOP"
+      info "En el siguiente inicio de sesión se abrirá la terminal maximizada."
+    fi
+    ;;
+  n|no|*)
+    info "No se configuró arranque automático."
+    ;;
+esac
+
 ok "Proceso completado."
+
