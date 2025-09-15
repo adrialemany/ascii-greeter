@@ -1,6 +1,6 @@
 # ASCII Greeter
 
-Bring your terminal to life with ASCII art and system information every time you open it!  
+Bring your linux terminal to life with ASCII art and system information every time you open it!  
 This project installs a small setup that prints colorful ASCII drawings alongside useful system info when a new terminal session starts.
 
 ---
@@ -17,7 +17,7 @@ The goal of this repository is to:
 
 ---
 
-## 🚀 Installation
+## 🚀 Installation (only tested on Ubuntu 22)
 
 1. Clone the repository:
 
