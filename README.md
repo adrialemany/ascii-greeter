@@ -125,15 +125,7 @@ Feel free to open an issue or send an email: **al426695@uji.es**
 
 When you open a new terminal, you’ll see something like this:
 
-██████╗  █████╗ ██████╗      Welcome back, Master 
-██╔══██╗██╔══██╗██╔══██╗     User: yourname 
-██║  ██║███████║██████╔╝     Device: hostname  
-██║  ██║██╔══██║██╔═══╝      OS: Ubuntu 22.04 LTS 
-██████╔╝██║  ██║██║          Uptime: up 2 hours, 13 minutes 
-╚═════╝ ╚═╝  ╚═╝╚═╝          Kernel: 6.8.0-45-generic            
-                             CPU: Intel(R) Core(TM) i7-8650U  
-                             RAM: 3.4G / 15G  
-                             Battery: 87% 
+![Preview](scripts/image.png)
                              
 ---
 
