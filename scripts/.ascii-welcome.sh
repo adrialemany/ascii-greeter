@@ -68,7 +68,8 @@ sys_info_lines=(
   "Device: $(hostname)"
   "OS: $(lsb_release -ds 2>/dev/null || (grep PRETTY_NAME /etc/os-release | cut -d'=' -f2 | tr -d '"') || echo 'N/A')"
   "Uptime: $(uptime -p)"
-  # If you're using a laptop, you can see the battery % with "echo "Battery: $battery_percent""
+  # If you're using a laptop, you can see the battery % with:
+  # "Battery: $battery_percent"
   "Kernel: $(uname -r)"
   "CPU: $(lscpu | grep 'Model name:' | sed -e 's/Model name:[ \t]*//' -e 's/ CPU @ .*//' || echo 'N/A')"
   "RAM: $(free -h | awk '/^Mem:/ {print $3 " / " $2}' || echo 'N/A')"
