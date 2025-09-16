@@ -72,6 +72,7 @@ sys_info_lines=(
   "Kernel: $(uname -r)"
   "CPU: $(lscpu | grep 'Model name:' | sed -e 's/Model name:[ \t]*//' -e 's/ CPU @ .*//' || echo 'N/A')"
   "RAM: $(free -h | awk '/^Mem:/ {print $3 " / " $2}' || echo 'N/A')"
+  "Alive since: $(date -d "$(cat /sys/class/dmi/id/bios_date 2>/dev/null)" +'%d/%m/%y' 2>/dev/null || echo 'N/A')"
 )
 
 info_width=0

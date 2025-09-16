@@ -34,7 +34,9 @@ else
   {
     echo ""
     echo "$MARKER_START"
-
+    echo "echo \"\""
+    echo "echo \"\""
+    echo "echo \"\""
     echo "if [ -t 1 ] && [ -z \"\$NO_ASCII_ART\" ]; then"
     echo "    \"$WELCOME_SCRIPT\""
     echo "fi"
